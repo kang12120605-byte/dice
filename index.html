@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Roll the dice</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#5f5f5f;--ink:#f5f5f5;--sub:#777;--line:#222;--die:#f5f5f5;--pip:#000;--win:#fff;--lose:#777;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;display:flex;justify-content:center;min-height:100vh}
+main{width:100%;max-width:420px;padding:40px 20px 32px;text-align:center}
+h1{font-size:14px;font-weight:500;letter-spacing:.3em;color:var(--sub);margin:0 0 28px}
+.score{display:flex;justify-content:center;align-items:baseline;gap:22px;margin-bottom:34px}
+.score b{font-size:56px;font-weight:200;line-height:1}
+.score span{font-size:12px;color:var(--sub);display:block;margin-bottom:6px}
+.score i{color:var(--line);font-style:normal;font-size:28px}
+.side{margin-bottom:8px}
+.lab{font-size:12px;color:var(--sub);margin-bottom:10px;height:16px}
+.lab b{color:var(--ink);font-size:14px;margin-left:6px}
+.dice{display:flex;gap:16px;justify-content:center}
+.die{width:72px;height:72px;background:var(--die);border-radius:14px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:11px}
+.die i{display:block}
+.die i.on{background:var(--pip);border-radius:50%;transform:scale(.8)}
+.die.rolling{animation:shake .12s infinite}
+@keyframes shake{0%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-3px)}100%{transform:rotate(-8deg)}}
+hr{border:0;border-top:1px solid var(--line);margin:24px 0}
+#msg{min-height:24px;font-size:16px;margin:26px 0 22px;color:var(--sub)}
+#msg.win{color:var(--win);font-weight:700}
+#msg.lose{color:var(--lose)}
+button{width:100%;padding:15px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:#000;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+button:disabled{opacity:.4;cursor:default}
+button.ghost{background:transparent;color:var(--sub);border-color:var(--line);margin-top:10px;font-weight:400;font-size:13px;padding:11px}
+.rec{font-size:12px;color:var(--sub);margin-top:22px}
+</style>
+</head>
+<body>
+<main>
+  <h1>DICE</h1>
+  <div class="score">
+    <div><span>나</span><b id="ps">0</b></div><i>:</i>
+    <div><span>컴퓨터</span><b id="cs">0</b></div>
+  </div>
+  <div class="side"><div class="lab">컴퓨터<b id="ct"></b></div><div class="dice"><div class="die" id="c1"></div><div class="die" id="c2"></div></div></div>
+  <hr>
+  <div class="side"><div class="lab">나<b id="pt"></b></div><div class="dice"><div class="die" id="p1"></div><div class="die" id="p2"></div></div></div>
+  <div id="msg">합이 큰 쪽이 승리 · 3승 선취</div>
+  <button id="roll">굴리기</button>
+  <button class="ghost" id="reset">다시 시작</button>
+  <div class="rec" id="rec"></div>
+</main>
+<script>
+const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const $=id=>document.getElementById(id);
+const WIN=3,ids=["c1","c2","p1","p2"];
+let ps=0,cs=0,busy=false,over=false,rec={w:0,l:0};
+try{const r=JSON.parse(localStorage.getItem("dice-rec")||"null");if(r&&typeof r.w==="number")rec=r}catch(e){}
+const rnd=()=>Math.floor(Math.random()*6)+1;
+function setDie(el,v){el.innerHTML="";for(let i=0;i<9;i++){const s=document.createElement("i");if(PIPS[v].includes(i))s.className="on";el.appendChild(s)}}
+function showRec(){$("rec").textContent="전적 "+rec.w+"승 "+rec.l+"패"}
+ids.forEach(i=>setDie($(i),1));showRec();
+function roll(){
+  if(busy)return;
+  if(over)return reset();
+  busy=true;$("roll").disabled=true;$("msg").textContent="…";$("msg").className="";
+  ids.forEach(i=>$(i).classList.add("rolling"));
+  const t=setInterval(()=>ids.forEach(i=>setDie($(i),rnd())),90);
+  setTimeout(()=>{
+    clearInterval(t);
+    const v=ids.map(rnd);
+    ids.forEach((id,k)=>{setDie($(id),v[k]);$(id).classList.remove("rolling")});
+    const c=v[0]+v[1],p=v[2]+v[3];
+    $("ct").textContent=c;$("pt").textContent=p;
+    let m="무승부",cls="";
+    if(p>c){ps++;m="승리";cls="win"}else if(c>p){cs++;m="패배";cls="lose"}
+    $("ps").textContent=ps;$("cs").textContent=cs;
+    if(ps>=WIN||cs>=WIN){
+      over=true;
+      if(ps>=WIN){rec.w++;m="최종 승리"}else{rec.l++;m="최종 패배"}
+      try{localStorage.setItem("dice-rec",JSON.stringify(rec))}catch(e){}
+      showRec();$("roll").textContent="한 판 더";
+    }
+    $("msg").textContent=m;$("msg").className=cls;
+    busy=false;$("roll").disabled=false;
+  },800);
+}
+function reset(){
+  ps=cs=0;over=false;busy=false;
+  $("ps").textContent=0;$("cs").textContent=0;$("ct").textContent="";$("pt").textContent="";
+  $("msg").textContent="합이 큰 쪽이 승리 · 3승 선취";$("msg").className="";
+  $("roll").textContent="굴리기";$("roll").disabled=false;
+  ids.forEach(i=>setDie($(i),1));
+}
+$("roll").onclick=roll;$("reset").onclick=reset;
+</script>
+</body>
+</html>
