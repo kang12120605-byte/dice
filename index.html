@@ -4,49 +4,53 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Roll the dice</title>
+<title>주사위 게임</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#5f5f5f;--ink:#f5f5f5;--sub:#777;--line:#222;--die:#f5f5f5;--pip:#000;--win:#fff;--lose:#777;color-scheme:dark}
+--bg:#2a2a29;--ink:#ffffff;--sub:#dcdcd6;--line:#77776f;--win:#ffffff;--lose:#c9c9c3;color-scheme:dark;
+--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .7 -.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+--blot:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E")}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;display:flex;justify-content:center;min-height:100vh}
+body{margin:0;background:var(--grain),var(--blot),var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;display:flex;justify-content:center;min-height:100vh;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 main{width:100%;max-width:420px;padding:40px 20px 32px;text-align:center}
-h1{font-size:14px;font-weight:500;letter-spacing:.3em;color:var(--sub);margin:0 0 28px}
+h1{font-size:14px;font-weight:600;letter-spacing:.35em;color:var(--sub);margin:0 0 28px;text-shadow:0 -1px 0 #000,0 1px 0 rgba(255,255,255,.12)}
 .score{display:flex;justify-content:center;align-items:baseline;gap:22px;margin-bottom:34px}
-.score b{font-size:56px;font-weight:200;line-height:1}
-.score span{font-size:12px;color:var(--sub);display:block;margin-bottom:6px}
+.score b{font-size:56px;font-weight:300;line-height:1;text-shadow:0 -1px 0 #000,0 1px 0 rgba(255,255,255,.15)}
+.score span{font-size:14px;color:var(--sub);display:block;margin-bottom:6px}
 .score i{color:var(--line);font-style:normal;font-size:28px}
 .side{margin-bottom:8px}
-.lab{font-size:12px;color:var(--sub);margin-bottom:10px;height:16px}
-.lab b{color:var(--ink);font-size:14px;margin-left:6px}
+.lab{font-size:14px;color:var(--sub);margin-bottom:10px;height:16px}
+.lab b{color:var(--ink);font-size:17px;margin-left:6px}
 .dice{display:flex;gap:16px;justify-content:center}
-.die{width:72px;height:72px;background:var(--die);border-radius:14px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:11px}
+.die{width:72px;height:72px;background:var(--grain),var(--blot),#a8a8a3;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -3px 6px rgba(0,0,0,.35),0 6px 12px rgba(0,0,0,.6)}
 .die i{display:block}
-.die i.on{background:var(--pip);border-radius:50%;transform:scale(.8)}
+.die i.on{background:#262624;border-radius:50%;transform:scale(.8);box-shadow:inset 0 2px 3px #000,0 1px 0 rgba(255,255,255,.4)}
 .die.rolling{animation:shake .12s infinite}
 @keyframes shake{0%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-3px)}100%{transform:rotate(-8deg)}}
-hr{border:0;border-top:1px solid var(--line);margin:24px 0}
-#msg{min-height:24px;font-size:16px;margin:26px 0 22px;color:var(--sub)}
+hr{border:0;border-top:1px solid #111;border-bottom:1px solid rgba(255,255,255,.1);margin:24px 0}
+#msg{min-height:24px;font-size:18px;margin:26px 0 22px;color:var(--sub)}
 #msg.win{color:var(--win);font-weight:700}
 #msg.lose{color:var(--lose)}
-button{width:100%;padding:15px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:#000;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
-button:disabled{opacity:.4;cursor:default}
-button.ghost{background:transparent;color:var(--sub);border-color:var(--line);margin-top:10px;font-weight:400;font-size:13px;padding:11px}
-.rec{font-size:12px;color:var(--sub);margin-top:22px}
+button{text-shadow:none;width:100%;padding:15px;border:0;border-radius:6px;background:var(--grain),var(--blot),#c9c9c4;color:#181817;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 10px rgba(0,0,0,.5)}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.5;cursor:default}
+button.ghost{text-shadow:0 1px 2px rgba(0,0,0,.7);background:transparent;color:var(--sub);border:1px solid #8a8a83;margin-top:12px;font-weight:500;font-size:14px;padding:11px;box-shadow:none}
+.rec{font-size:13px;color:var(--sub);margin-top:22px}
+.mode{display:flex;justify-content:center;gap:8px;margin:-8px 0 24px}
+button.seg{width:auto;padding:8px 20px;background:transparent;color:var(--sub);border:1px solid #8a8a83;box-shadow:none;font-weight:500;font-size:14px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+button.seg.on{background:var(--grain),var(--blot),#c9c9c4;color:#181817;border-color:transparent;text-shadow:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 8px rgba(0,0,0,.5)}
+.score{gap:18px}
+hr{margin:16px 0}
 </style>
 </head>
 <body>
 <main>
   <h1>DICE</h1>
-  <div class="score">
-    <div><span>나</span><b id="ps">0</b></div><i>:</i>
-    <div><span>컴퓨터</span><b id="cs">0</b></div>
-  </div>
-  <div class="side"><div class="lab">컴퓨터<b id="ct"></b></div><div class="dice"><div class="die" id="c1"></div><div class="die" id="c2"></div></div></div>
-  <hr>
-  <div class="side"><div class="lab">나<b id="pt"></b></div><div class="dice"><div class="die" id="p1"></div><div class="die" id="p2"></div></div></div>
-  <div id="msg">합이 큰 쪽이 승리 · 3승 선취</div>
+  <div class="mode"><button class="seg on" data-n="2">2명</button><button class="seg" data-n="3">3명</button></div>
+  <div class="score" id="score"></div>
+  <div id="board"></div>
+  <div id="msg"></div>
   <button id="roll">굴리기</button>
   <button class="ghost" id="reset">다시 시작</button>
   <div class="rec" id="rec"></div>
@@ -54,46 +58,64 @@ button.ghost{background:transparent;color:var(--sub);border-color:var(--line);ma
 <script>
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const $=id=>document.getElementById(id);
-const WIN=3,ids=["c1","c2","p1","p2"];
-let ps=0,cs=0,busy=false,over=false,rec={w:0,l:0};
+const WIN=3,HINT="합이 가장 큰 사람이 승리 · 3승 선취";
+let n=2,names=[],sc=[],dice=[],busy=false,over=false,rec={w:0,l:0};
 try{const r=JSON.parse(localStorage.getItem("dice-rec")||"null");if(r&&typeof r.w==="number")rec=r}catch(e){}
 const rnd=()=>Math.floor(Math.random()*6)+1;
 function setDie(el,v){el.innerHTML="";for(let i=0;i<9;i++){const s=document.createElement("i");if(PIPS[v].includes(i))s.className="on";el.appendChild(s)}}
-function showRec(){$("rec").textContent="전적 "+rec.w+"승 "+rec.l+"패"}
-ids.forEach(i=>setDie($(i),1));showRec();
+function showRec(){$("rec").textContent="내 전적 "+rec.w+"승 "+rec.l+"패"}
+function reset(){
+  busy=false;over=false;
+  names=n===2?["나","컴퓨터"]:["나","친구","컴퓨터"];
+  sc=names.map(()=>0);
+  $("score").innerHTML=names.map((x,i)=>'<div><span>'+x+'</span><b id="s'+i+'">0</b></div>').join("<i>:</i>");
+  $("board").innerHTML=names.map((x,i)=>'<div class="side"><div class="lab">'+x+'<b id="t'+i+'"></b></div><div class="dice"><div class="die" id="d'+i+'a"></div><div class="die" id="d'+i+'b"></div></div></div>').join("<hr>");
+  dice=[];names.forEach((x,i)=>dice.push($("d"+i+"a"),$("d"+i+"b")));
+  dice.forEach(d=>setDie(d,1));
+  $("msg").textContent=HINT;$("msg").className="";
+  $("roll").textContent="굴리기";$("roll").disabled=false;
+  showRec();
+}
 function roll(){
   if(busy)return;
   if(over)return reset();
   busy=true;$("roll").disabled=true;$("msg").textContent="…";$("msg").className="";
-  ids.forEach(i=>$(i).classList.add("rolling"));
-  const t=setInterval(()=>ids.forEach(i=>setDie($(i),rnd())),90);
+  dice.forEach(d=>d.classList.add("rolling"));
+  const t=setInterval(()=>dice.forEach(d=>setDie(d,rnd())),90);
   setTimeout(()=>{
     clearInterval(t);
-    const v=ids.map(rnd);
-    ids.forEach((id,k)=>{setDie($(id),v[k]);$(id).classList.remove("rolling")});
-    const c=v[0]+v[1],p=v[2]+v[3];
-    $("ct").textContent=c;$("pt").textContent=p;
+    const sums=names.map((x,i)=>{
+      const a=rnd(),b=rnd();
+      setDie(dice[i*2],a);setDie(dice[i*2+1],b);
+      $("t"+i).textContent=a+b;
+      return a+b;
+    });
+    dice.forEach(d=>d.classList.remove("rolling"));
+    const max=Math.max(...sums),top=sums.map((v,i)=>v===max?i:-1).filter(i=>i>=0);
     let m="무승부",cls="";
-    if(p>c){ps++;m="승리";cls="win"}else if(c>p){cs++;m="패배";cls="lose"}
-    $("ps").textContent=ps;$("cs").textContent=cs;
-    if(ps>=WIN||cs>=WIN){
-      over=true;
-      if(ps>=WIN){rec.w++;m="최종 승리"}else{rec.l++;m="최종 패배"}
-      try{localStorage.setItem("dice-rec",JSON.stringify(rec))}catch(e){}
-      showRec();$("roll").textContent="한 판 더";
-    }
+    if(top.length===1){
+      const w=top[0];sc[w]++;
+      m=names[w]+" 승리";cls=names[w]==="컴퓨터"?"lose":"win";
+      $("s"+w).textContent=sc[w];
+      if(sc[w]>=WIN){
+        over=true;m="🏆 "+names[w]+" 최종 승리";
+        if(w===0)rec.w++;else rec.l++;
+        try{localStorage.setItem("dice-rec",JSON.stringify(rec))}catch(e){}
+        showRec();$("roll").textContent="한 판 더";
+      }
+    }else if(top.length<names.length){m=top.map(i=>names[i]).join("·")+" 공동 1위 · 무승부"}
     $("msg").textContent=m;$("msg").className=cls;
     busy=false;$("roll").disabled=false;
   },800);
 }
-function reset(){
-  ps=cs=0;over=false;busy=false;
-  $("ps").textContent=0;$("cs").textContent=0;$("ct").textContent="";$("pt").textContent="";
-  $("msg").textContent="합이 큰 쪽이 승리 · 3승 선취";$("msg").className="";
-  $("roll").textContent="굴리기";$("roll").disabled=false;
-  ids.forEach(i=>setDie($(i),1));
-}
+document.querySelectorAll(".seg").forEach(b=>b.onclick=()=>{
+  if(busy)return;
+  n=+b.dataset.n;
+  document.querySelectorAll(".seg").forEach(x=>x.classList.toggle("on",x===b));
+  reset();
+});
 $("roll").onclick=roll;$("reset").onclick=reset;
+reset();
 </script>
 </body>
 </html>
